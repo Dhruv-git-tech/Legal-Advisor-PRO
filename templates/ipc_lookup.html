@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPC/BNS Lookup — LegalAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">⚖</div>
+                <span class="sidebar-logo-text">LegalAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Main</div>
+                <a href="/dashboard" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+                <a href="/search" class="sidebar-link"><span class="icon">🔍</span> Case Search</a>
+                <a href="/chatbot" class="sidebar-link"><span class="icon">💬</span> AI Chatbot</a>
+                <div class="sidebar-section-label">Tools</div>
+                <a href="/drafter" class="sidebar-link"><span class="icon">📝</span> Document Drafter</a>
+                <a href="/ipc-lookup" class="sidebar-link active"><span class="icon">📖</span> IPC/BNS Lookup</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/">← Back to Home</a></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+            <div class="page-header">
+                <h1>IPC / BNS Section Lookup</h1>
+                <p>Search Indian Penal Code sections with BNS equivalents, punishments & descriptions</p>
+            </div>
+
+            <div class="ipc-layout">
+                <!-- Search -->
+                <div class="ipc-search-bar">
+                    <input type="text" id="ipcSearchInput"
+                        placeholder="Search by section number, title, or keyword (e.g., 302, murder, theft)..."
+                        onkeydown="if(event.key==='Enter')searchIPC()">
+                    <button class="btn-ipc-search" onclick="searchIPC()">🔍 Search</button>
+                </div>
+
+                <!-- Suggest from Case Description -->
+                <div style="margin-bottom: 2rem;">
+                    <details>
+                        <summary
+                            style="cursor: pointer; color: var(--gold); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                            🤖 Find Applicable Sections from Case Description
+                        </summary>
+                        <div style="margin-top: 0.75rem;">
+                            <textarea id="caseDescForIPC"
+                                placeholder="Describe your case to find applicable IPC sections..." rows="3"
+                                style="width: 100%; padding: 0.75rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: vertical;"></textarea>
+                            <button class="btn-ipc-search" style="margin-top: 0.5rem;" onclick="suggestSections()">Find
+                                Applicable Sections</button>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Results -->
+                <div id="ipcResults" class="ipc-results"></div>
+
+                <!-- Loading -->
+                <div id="ipcLoading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Searching sections...</p>
+                </div>
+
+                <!-- Category Browser -->
+                <h2
+                    style="font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text-primary); margin: 2rem 0 1rem;">
+                    Browse by Category</h2>
+                <div class="ipc-categories">
+                    {% for category, sections in categories.items() %}
+                    <div class="category-group">
+                        <div class="category-header"
+                            onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+                            <h4>{{ category }}</h4>
+                            <span class="count">{{ sections|length }}</span>
+                        </div>
+                        <div
+                            style="display: none; padding: 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm);">
+                            {% for sec in sections %}
+                            <div
+                                style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--text-secondary); font-size: 0.85rem;">
+                                    <span style="color: var(--gold); font-weight: 700;">Section {{ sec.section }}</span>
+                                    — {{ sec.title }}
+                                </span>
+                                <button onclick="searchIPCDirect('{{ sec.section }}')"
+                                    style="background: var(--gold-dim); color: var(--gold); border: none; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; cursor: pointer;">View</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function searchIPC() {
+            const query = document.getElementById('ipcSearchInput').value.trim();
+            if (!query) return;
+
+            document.getElementById('ipcLoading').style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/ipc-lookup?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                displayIPCResults(data.results || []);
+            } catch (error) {
+                document.getElementById('ipcResults').innerHTML = '<p style="color: var(--accent-red);">Error searching sections.</p>';
+            } finally {
+                document.getElementById('ipcLoading').style.display = 'none';
+            }
+        }
+
+        function searchIPCDirect(section) {
+            document.getElementById('ipcSearchInput').value = section;
+            searchIPC();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function suggestSections() {
+            const description = document.getElementById('caseDescForIPC').value.trim();
+            if (!description) return;
+
+            document.getElementById('ipcLoading').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/ipc-suggest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description })
+                });
+                const data = await response.json();
+                displayIPCResults(data.suggestions || []);
+            } catch (error) {
+                document.getElementById('ipcResults').innerHTML = '<p style="color: var(--accent-red);">Error finding sections.</p>';
+            } finally {
+                document.getElementById('ipcLoading').style.display = 'none';
+            }
+        }
+
+        function displayIPCResults(results) {
+            const container = document.getElementById('ipcResults');
+
+            if (results.length === 0) {
+                container.innerHTML = '<div class="ipc-card"><p style="color: var(--text-muted);">No matching sections found. Try a different search term.</p></div>';
+                return;
+            }
+
+            container.innerHTML = results.map(r => `
+                <div class="ipc-card">
+                    <div class="ipc-card-header">
+                        <div>
+                            <span class="ipc-title">${r.title}</span>
+                            <div class="ipc-category">${r.category}</div>
+                        </div>
+                        <span class="ipc-section-num">Section ${r.section}</span>
+                    </div>
+                    <div class="ipc-description">${r.description}</div>
+                    <div class="ipc-meta">
+                        <span>⚖ ${r.punishment}</span>
+                        <span class="bns-ref">BNS: ${r.bns}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalAI — AI-Powered Legal Assistant</title>
+    <meta name="description" content="AI-powered legal assistant using NLP and LLMs for case search, verdict prediction, document drafting, and legal chatbot. Built for Indian law.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar-landing">
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="logo-icon-bg"><span class="logo-icon">⚖</span></div>
+                <span class="logo-text">LegalAI</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#tech" class="nav-link">Technology</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="/dashboard" class="nav-btn-primary">Launch App →</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">⚡ Powered by Google Gemini + spaCy NLP</div>
+            <h1 class="hero-headline">
+                Your AI-Powered<br><span class="highlight">Legal Assistant</span>
+            </h1>
+            <p class="hero-description">
+                Find similar legal cases, predict verdicts, draft legal documents, and get instant legal guidance — all powered by advanced NLP and Large Language Models.
+            </p>
+            <div class="hero-cta">
+                <a href="/dashboard" class="cta-primary">Get Started Free →</a>
+                <a href="#features" class="cta-secondary">Explore Features</a>
+            </div>
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <div class="trust-number">400+</div>
+                    <div class="trust-label">Cases Indexed</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-number">6</div>
+                    <div class="trust-label">AI Modules</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-number">47</div>
+                    <div class="trust-label">IPC Sections</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-number"><1s</div>
+                    <div class="trust-label">Search Speed</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Legal AI Features</h2>
+                <p class="section-subtitle">Six integrated modules for comprehensive legal assistance</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">🔍</div>
+                    <h3>Smart Case Search</h3>
+                    <p>TF-IDF + cosine similarity to find the most relevant legal precedents from 400+ indexed Indian court cases.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">🤖</div>
+                    <h3>AI Verdict Prediction</h3>
+                    <p>Gemini-powered analysis with win probability, legal strategy, and detailed reasoning for your case.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">💬</div>
+                    <h3>Legal AI Chatbot</h3>
+                    <p>Ask any legal question and get instant, contextual answers about Indian law, IPC sections, and rights.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">📝</div>
+                    <h3>Document Drafter</h3>
+                    <p>Auto-generate FIRs, legal notices, complaints, bail applications, affidavits, and RTI applications.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">📖</div>
+                    <h3>IPC/BNS Lookup</h3>
+                    <p>Search 47+ IPC sections with BNS equivalents, punishments, and AI-powered plain-language explanations.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">🏷️</div>
+                    <h3>Legal NER</h3>
+                    <p>spaCy-powered entity extraction: courts, acts, sections, persons, dates, and monetary amounts from legal text.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section id="tech" class="tech-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Technology Stack</h2>
+                <p class="section-subtitle">Built with cutting-edge AI and NLP technologies</p>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">🧠</div>
+                    <h4>Google Gemini</h4>
+                    <p>LLM for analysis & chat</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🔬</div>
+                    <h4>spaCy NLP</h4>
+                    <p>Named Entity Recognition</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📊</div>
+                    <h4>TF-IDF</h4>
+                    <p>Text vectorization</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📐</div>
+                    <h4>Cosine Similarity</h4>
+                    <p>Case matching algorithm</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🐍</div>
+                    <h4>Flask + Python</h4>
+                    <p>Backend framework</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🗄️</div>
+                    <h4>SQLite</h4>
+                    <p>Persistent storage</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📄</div>
+                    <h4>PyPDF2</h4>
+                    <p>PDF text extraction</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🔄</div>
+                    <h4>Groq Fallback</h4>
+                    <p>Multi-provider LLM</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">From case description to AI-powered legal insights</p>
+            </div>
+            <div class="steps">
+                <div class="step-item">
+                    <div class="step-visual">
+                        <div class="step-number">01</div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Describe Your Case</h3>
+                        <p>Enter your legal case details. The NLP engine automatically extracts entities and summarizes key points.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-visual">
+                        <div class="step-number">02</div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>AI Analysis</h3>
+                        <p>Google Gemini analyzes your case, identifies applicable laws, and predicts verdict with confidence scores.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-visual">
+                        <div class="step-number">03</div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Find Precedents</h3>
+                        <p>TF-IDF + cosine similarity matches your case against 400+ indexed legal cases from the database.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-visual">
+                        <div class="step-number">04</div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Get Full Support</h3>
+                        <p>Draft legal documents, chat with AI for guidance, and look up IPC/BNS sections — all in one platform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="demo" class="demo-section">
+        <div class="container">
+            <div class="demo-box">
+                <div class="demo-header">
+                    <h2>Ready to Transform Your Legal Research?</h2>
+                    <p>Access all 6 AI modules — case search, chatbot, drafter, NER, IPC lookup, and verdict prediction.</p>
+                </div>
+                <div class="demo-buttons">
+                    <a href="/dashboard" class="btn-demo-primary">Launch Dashboard →</a>
+                    <a href="#features" class="btn-demo-secondary">View All Features</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">⚖ LegalAI</div>
+                    <p>AI-powered legal assistant for modern legal professionals. Built with NLP, LLMs, and Indian law expertise.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>AI Modules</h4>
+                    <ul>
+                        <li><a href="/search">Case Search</a></li>
+                        <li><a href="/chatbot">AI Chatbot</a></li>
+                        <li><a href="/drafter">Document Drafter</a></li>
+                        <li><a href="/ipc-lookup">IPC Lookup</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li>Google Gemini LLM</li>
+                        <li>spaCy NER</li>
+                        <li>TF-IDF + Cosine Similarity</li>
+                        <li>Flask + SQLite</li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>About</h4>
+                    <p>A CSE major project demonstrating AI/NLP integration in legal technology for Indian law assistance.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 LegalAI. Powered by Google Gemini, spaCy NLP, TF-IDF & scikit-learn</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

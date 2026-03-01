@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Search — LegalAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">⚖</div>
+                <span class="sidebar-logo-text">LegalAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Main</div>
+                <a href="/dashboard" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+                <a href="/search" class="sidebar-link active"><span class="icon">🔍</span> Case Search</a>
+                <a href="/chatbot" class="sidebar-link"><span class="icon">💬</span> AI Chatbot</a>
+                <div class="sidebar-section-label">Tools</div>
+                <a href="/drafter" class="sidebar-link"><span class="icon">📝</span> Document Drafter</a>
+                <a href="/ipc-lookup" class="sidebar-link"><span class="icon">📖</span> IPC/BNS Lookup</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/">← Back to Home</a></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+            <div class="page-header">
+                <h1>Case Search & Analysis</h1>
+                <p>Find similar legal cases and get AI-powered verdict predictions</p>
+            </div>
+
+            <div class="search-container">
+                <div class="input-section">
+                    <textarea id="caseStudy"
+                        placeholder="Describe your legal case here...&#10;&#10;Example: A case involving breach of contract where the defendant failed to deliver goods as per the agreed terms. The contract specified delivery within 30 days but the defendant delayed by 45 days, causing financial losses to the plaintiff."
+                        rows="7"></textarea>
+                    <button id="searchBtn" class="btn-search">⚖ Find Similar Cases & Analyze</button>
+                </div>
+
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing your case with AI...</p>
+                </div>
+
+                <!-- NER Entities -->
+                <div id="entitiesSection" class="entities-section" style="display: none;">
+                    <h2
+                        style="font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+                        🏷️ Extracted Legal Entities</h2>
+                    <div id="entitiesContainer" class="entities-grid"></div>
+                </div>
+
+                <div id="summarySection" style="display: none;">
+                    <h2>📋 Summarized Input</h2>
+                    <div class="summary-box" id="summaryBox"></div>
+                </div>
+
+                <div id="aiAnalysisSection" style="display: none;">
+                    <h2>🤖 AI Legal Analysis & Verdict Prediction</h2>
+                    <div id="aiAnalysisContainer"></div>
+                </div>
+
+                <div class="results-section" id="resultsSection" style="display: none;">
+                    <h2>🔍 Similar Cases Found</h2>
+                    <div id="resultsContainer"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

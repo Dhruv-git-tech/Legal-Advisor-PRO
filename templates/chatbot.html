@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot — LegalAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">⚖</div>
+                <span class="sidebar-logo-text">LegalAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Main</div>
+                <a href="/dashboard" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+                <a href="/search" class="sidebar-link"><span class="icon">🔍</span> Case Search</a>
+                <a href="/chatbot" class="sidebar-link active"><span class="icon">💬</span> AI Chatbot</a>
+                <div class="sidebar-section-label">Tools</div>
+                <a href="/drafter" class="sidebar-link"><span class="icon">📝</span> Document Drafter</a>
+                <a href="/ipc-lookup" class="sidebar-link"><span class="icon">📖</span> IPC/BNS Lookup</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/">← Back to Home</a></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+            <div class="page-header">
+                <h1>AI Legal Chatbot</h1>
+                <p>Ask any question about Indian law — IPC, rights, procedures, and more</p>
+            </div>
+
+            <div class="chat-layout">
+                <!-- Suggested Prompts -->
+                <div class="suggested-prompts" id="suggestedPrompts">
+                    {% for prompt in suggested_prompts %}
+                    <button class="suggested-prompt" onclick="askSuggested('{{ prompt }}')">{{ prompt }}</button>
+                    {% endfor %}
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-bubble assistant">
+                        👋 Hello! I'm your AI Legal Assistant. I specialize in Indian law — ask me about IPC sections,
+                        legal procedures, your rights, or any legal question. <em>Note: This is AI guidance, not
+                            professional legal advice.</em>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <textarea id="chatInput" placeholder="Ask a legal question..." rows="1"
+                            onkeydown="handleChatKeydown(event)"></textarea>
+                        <button class="btn-send" id="btnSend" onclick="sendMessage()">Send →</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const btnSend = document.getElementById('btnSend');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const suggestedPrompts = document.getElementById('suggestedPrompts');
+        let sessionId = '{{ session.get("chat_session_id", "") }}' || crypto.randomUUID();
+
+        function handleChatKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function askSuggested(prompt) {
+            chatInput.value = prompt;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            suggestedPrompts.style.display = 'none';
+
+            // Show typing
+            typingIndicator.style.display = 'flex';
+            btnSend.disabled = true;
+            scrollToBottom();
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, session_id: sessionId })
+                });
+
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+
+                if (data.success) {
+                    addMessage(data.response, 'assistant', data.provider);
+                } else {
+                    addMessage('Sorry, I encountered an error: ' + (data.error || 'Unknown error'), 'assistant');
+                }
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('Connection error. Please check your server is running.', 'assistant');
+            } finally {
+                btnSend.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        function addMessage(text, role, provider) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}`;
+
+            // Format markdown-like text for assistant
+            if (role === 'assistant') {
+                let formatted = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/^- (.*)/gm, '• $1')
+                    .replace(/^(\d+)\. (.*)/gm, '<strong>$1.</strong> $2')
+                    .replace(/\n/g, '<br>');
+
+                bubble.innerHTML = formatted;
+
+                if (provider) {
+                    bubble.innerHTML += `<div class="provider-tag">via ${provider}</div>`;
+                }
+            } else {
+                bubble.textContent = text;
+            }
+
+            chatMessages.appendChild(bubble);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    </script>
+</body>
+
+</html>

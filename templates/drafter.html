@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Drafter — LegalAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">⚖</div>
+                <span class="sidebar-logo-text">LegalAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Main</div>
+                <a href="/dashboard" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+                <a href="/search" class="sidebar-link"><span class="icon">🔍</span> Case Search</a>
+                <a href="/chatbot" class="sidebar-link"><span class="icon">💬</span> AI Chatbot</a>
+                <div class="sidebar-section-label">Tools</div>
+                <a href="/drafter" class="sidebar-link active"><span class="icon">📝</span> Document Drafter</a>
+                <a href="/ipc-lookup" class="sidebar-link"><span class="icon">📖</span> IPC/BNS Lookup</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/">← Back to Home</a></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+            <div class="page-header">
+                <h1>Legal Document Drafter</h1>
+                <p>Auto-generate legal documents using AI — FIR, legal notice, complaint, and more</p>
+            </div>
+
+            <div class="drafter-layout">
+                <!-- Step 1: Select Document Type -->
+                <h2
+                    style="font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--text-primary); margin-bottom: 1rem;">
+                    Step 1: Select Document Type</h2>
+
+                <div class="doc-type-selector" id="docTypeSelector">
+                    {% for type_id, type_info in document_types.items() %}
+                    <div class="doc-type-card" data-type="{{ type_id }}" onclick="selectDocType('{{ type_id }}')">
+                        <div class="doc-icon">
+                            {% if type_id == 'fir' %}📋{% elif type_id == 'legal_notice' %}📨{% elif type_id ==
+                            'complaint' %}⚖{% elif type_id == 'bail_application' %}🔓{% elif type_id == 'affidavit'
+                            %}📜{% elif type_id == 'rti_application' %}🏛️{% endif %}
+                        </div>
+                        <h4>{{ type_info.name }}</h4>
+                        <p>{{ type_info.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Step 2: Fill Details -->
+                <div id="draftFormSection" style="display: none;">
+                    <h2
+                        style="font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--text-primary); margin-bottom: 1rem;">
+                        Step 2: Enter Details</h2>
+                    <div class="draft-form">
+                        <div id="formFields"></div>
+                        <button class="btn-draft" id="btnDraft" onclick="generateDocument()">
+                            ✨ Generate Document
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="draftLoading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>AI is drafting your document...</p>
+                </div>
+
+                <!-- Step 3: Preview -->
+                <div id="documentPreview" class="document-preview" style="display: none;">
+                    <h3>📄 Generated Document</h3>
+                    <div class="document-content" id="documentContent"></div>
+                    <button class="btn-copy" onclick="copyDocument()">📋 Copy to Clipboard</button>
+                    <button class="btn-download" onclick="downloadDocument()">📥 Download as Text</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const documentTypes = {{ document_types | tojson }};
+        let selectedType = null;
+        let generatedDocument = '';
+
+        function selectDocType(typeId) {
+            selectedType = typeId;
+
+            // Update selected state
+            document.querySelectorAll('.doc-type-card').forEach(card => {
+                card.classList.toggle('selected', card.dataset.type === typeId);
+            });
+
+            // Build form fields
+            const typeInfo = documentTypes[typeId];
+            const formFields = document.getElementById('formFields');
+            formFields.innerHTML = '';
+
+            typeInfo.fields.forEach(field => {
+                const label = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                const isLongField = ['description_of_incident', 'facts', 'grounds_for_bail', 'information_required', 'facts_to_state', 'demand', 'relief_sought', 'supporting_documents'].includes(field);
+
+                formFields.innerHTML += `
+                    <div class="form-group">
+                        <label for="${field}">${label}</label>
+                        ${isLongField
+                        ? `<textarea id="${field}" name="${field}" rows="3" placeholder="Enter ${label.toLowerCase()}..."></textarea>`
+                        : `<input type="text" id="${field}" name="${field}" placeholder="Enter ${label.toLowerCase()}...">`
+                    }
+                    </div>
+                `;
+            });
+
+            document.getElementById('draftFormSection').style.display = 'block';
+            document.getElementById('documentPreview').style.display = 'none';
+
+            // Smooth scroll to form
+            document.getElementById('draftFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function generateDocument() {
+            if (!selectedType) return;
+
+            const typeInfo = documentTypes[selectedType];
+            const details = {};
+
+            typeInfo.fields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) details[field] = el.value;
+            });
+
+            // Check if at least some fields are filled
+            const filledFields = Object.values(details).filter(v => v.trim()).length;
+            if (filledFields === 0) {
+                showToast('Please fill in at least some details', 'error');
+                return;
+            }
+
+            document.getElementById('draftLoading').style.display = 'block';
+            document.getElementById('documentPreview').style.display = 'none';
+            document.getElementById('btnDraft').disabled = true;
+
+            try {
+                const response = await fetch('/api/draft', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ doc_type: selectedType, details })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    generatedDocument = data.document;
+                    document.getElementById('documentContent').textContent = data.document;
+                    document.getElementById('documentPreview').style.display = 'block';
+                    showToast('Document generated successfully!', 'success');
+                } else {
+                    showToast(data.error || 'Failed to generate document', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error. Check your server.', 'error');
+            } finally {
+                document.getElementById('draftLoading').style.display = 'none';
+                document.getElementById('btnDraft').disabled = false;
+            }
+        }
+
+        function copyDocument() {
+            navigator.clipboard.writeText(generatedDocument).then(() => {
+                showToast('Document copied to clipboard!', 'success');
+            });
+        }
+
+        function downloadDocument() {
+            const blob = new Blob([generatedDocument], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedType}_draft.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Document downloaded!', 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+    </script>
+</body>
+
+</html>

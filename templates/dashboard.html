@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — LegalAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">⚖</div>
+                <span class="sidebar-logo-text">LegalAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Main</div>
+                <a href="/dashboard" class="sidebar-link active">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/search" class="sidebar-link">
+                    <span class="icon">🔍</span> Case Search
+                </a>
+                <a href="/chatbot" class="sidebar-link">
+                    <span class="icon">💬</span> AI Chatbot
+                </a>
+                <div class="sidebar-section-label">Tools</div>
+                <a href="/drafter" class="sidebar-link">
+                    <span class="icon">📝</span> Document Drafter
+                </a>
+                <a href="/ipc-lookup" class="sidebar-link">
+                    <span class="icon">📖</span> IPC/BNS Lookup
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/">← Back to Home</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Welcome to LegalAI — Your AI-Powered Legal Assistant</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon search">🔍</div>
+                    <div class="stat-number" id="statSearches">{{ stats.total_searches }}</div>
+                    <div class="stat-label">Case Searches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon chat">💬</div>
+                    <div class="stat-number" id="statChats">{{ stats.total_chats }}</div>
+                    <div class="stat-label">Chat Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon draft">📝</div>
+                    <div class="stat-number" id="statDocs">{{ stats.total_documents }}</div>
+                    <div class="stat-label">Documents Drafted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon cases">📚</div>
+                    <div class="stat-number">400+</div>
+                    <div class="stat-label">Cases in Database</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="page-header" style="margin-top: 1rem;">
+                <h1 style="font-size: 1.35rem;">Quick Actions</h1>
+                <p>Access all AI modules from one place</p>
+            </div>
+
+            <div class="quick-actions">
+                <a href="/search" class="action-card">
+                    <div class="action-icon">🔍</div>
+                    <h3>Search Similar Cases</h3>
+                    <p>Find relevant legal precedents using AI-powered case matching with TF-IDF and cosine similarity.
+                    </p>
+                </a>
+                <a href="/chatbot" class="action-card">
+                    <div class="action-icon">💬</div>
+                    <h3>Ask AI Chatbot</h3>
+                    <p>Get instant answers about Indian law, IPC sections, legal procedures, and your rights.</p>
+                </a>
+                <a href="/drafter" class="action-card">
+                    <div class="action-icon">📝</div>
+                    <h3>Draft Documents</h3>
+                    <p>Auto-generate FIRs, legal notices, complaints, bail applications, and RTI applications.</p>
+                </a>
+                <a href="/ipc-lookup" class="action-card">
+                    <div class="action-icon">📖</div>
+                    <h3>IPC/BNS Lookup</h3>
+                    <p>Search 47+ IPC sections with BNS equivalents, punishments, and descriptions.</p>
+                </a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
